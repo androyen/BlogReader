@@ -2,6 +2,7 @@ package com.androyen.blogreader;
 
 import android.app.ListActivity;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,26 +28,10 @@ public class MainListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_list);
 
-        //Get data from the web
+        //Using AsyncTask to get the blog URL
+        GetBlogPostsTask getBlogPostsTask = new GetBlogPostsTask();
+        getBlogPostsTask.execute();
 
-        try {
-            URL blogFeedURL = new URL("http://blog.teamtreehouse.com/api/get_recent_summary/?count=" + NUMBER_OF_POSTS);
-            HttpURLConnection connection = (HttpURLConnection) blogFeedURL.openConnection();
-            connection.connect();
-
-            int responseCode = connection.getResponseCode();
-            Log.i(TAG, "Code: " + responseCode + "");
-
-        }
-        catch (MalformedURLException e) {
-            Log.e(TAG, "Exception caught", e);
-        }
-        catch (IOException e) {
-            Log.e(TAG, "IOException caught", e);
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Exception caught", e);
-        }
 
         //Initialize String array
         Resources resources = getResources();
@@ -77,5 +62,41 @@ public class MainListActivity extends ListActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //Separate class for AsyncTask thread to handle network connection
+    private class GetBlogPostsTask extends AsyncTask<Object, Void, String> {
+
+
+        //Will return a string
+        @Override
+        protected String doInBackground(Object[] objects) {
+
+            //-1 is the response code for an error
+            int responseCode = -1;
+
+            //Get data from the web
+
+            try {
+                URL blogFeedURL = new URL("http://blog.teamtreehouse.com/api/get_recent_summary/?count=" + NUMBER_OF_POSTS);
+                HttpURLConnection connection = (HttpURLConnection) blogFeedURL.openConnection();
+                connection.connect();
+
+
+                Log.i(TAG, "Code: " + responseCode + "");
+
+            }
+            catch (MalformedURLException e) {
+                Log.e(TAG, "Exception caught", e);
+            }
+            catch (IOException e) {
+                Log.e(TAG, "IOException caught", e);
+            }
+            catch (Exception e) {
+                Log.e(TAG, "Exception caught", e);
+            }
+
+            return "Code: " + responseCode;
+        }
     }
 }
