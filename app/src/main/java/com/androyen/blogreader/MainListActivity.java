@@ -13,6 +13,10 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +29,7 @@ import java.net.URL;
 public class MainListActivity extends ListActivity {
 
     protected String[] mBlogPostTitles;
+    protected JSONObject mBlogData;
 
     public static final int NUMBER_OF_POSTS = 20;
 
@@ -94,16 +99,35 @@ public class MainListActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateList() {
+
+        if (mBlogData == null) {
+            //TODO: Handle error
+        }
+        else {
+
+            try {
+                Log.d(TAG, mBlogData.toString(2));
+            }
+            catch (JSONException e) {
+                Log.d(TAG, "Exception caught!");
+            }
+        }
+    }
+
     //Separate class for AsyncTask thread to handle network connection
-    private class GetBlogPostsTask extends AsyncTask<Object, Void, String> {
+    private class GetBlogPostsTask extends AsyncTask<Object, Void, JSONObject> {
 
 
         //Will return a string
         @Override
-        protected String doInBackground(Object[] objects) {
+        protected JSONObject doInBackground(Object[] objects) {
 
             //-1 is the response code for an error
             int responseCode = -1;
+
+            //Used to return
+            JSONObject jsonResponse = null;
 
 
 
@@ -128,7 +152,10 @@ public class MainListActivity extends ListActivity {
 
                     //Convert charArray to string
                     String responseData = new String(charArray);
-                    Log.v(TAG, responseData);
+
+                    //Convert to JSON
+                    jsonResponse = new JSONObject(responseData);
+
                 }
                 else {
                     Log.i(TAG, "Unsuccessful HTTP Code: " + responseCode);
@@ -148,7 +175,16 @@ public class MainListActivity extends ListActivity {
                 Log.e(TAG, "Exception caught", e);
             }
 
-            return "Code: " + responseCode;
+            return jsonResponse;
+        }
+
+
+        //Get result of doInBackground() method. Runs in main UI thread
+        @Override
+        protected void onPostExecute(JSONObject result) {
+
+            mBlogData = result;
+            updateList();
         }
     }
 }
