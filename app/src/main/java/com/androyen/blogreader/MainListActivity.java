@@ -109,6 +109,7 @@ public class MainListActivity extends ListActivity {
             builder.setTitle(getString(R.string.error_message));
             builder.setPositiveButton(android.R.string.ok, null);
             AlertDialog dialog = builder.create();
+            dialog.show();
         }
         else {
 
