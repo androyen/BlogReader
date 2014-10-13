@@ -22,4 +22,7 @@
 
     </string-array>
 
+    <string name="error_title">Ooops! Sorry!</string>
+    <string name="error_message">There was an error getting data from the blog</string>
+
 </resources>
