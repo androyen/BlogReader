@@ -14,6 +14,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -102,12 +105,34 @@ public class MainListActivity extends ListActivity {
             //-1 is the response code for an error
             int responseCode = -1;
 
+
+
             //Get data from the web
 
             try {
+
                 URL blogFeedURL = new URL("http://blog.teamtreehouse.com/api/get_recent_summary/?count=" + NUMBER_OF_POSTS);
                 HttpURLConnection connection = (HttpURLConnection) blogFeedURL.openConnection();
                 connection.connect();
+
+                //Get inputstream and store the characters in Array
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                    InputStream inputStream = connection.getInputStream();
+                    Reader reader = new InputStreamReader(inputStream);
+                    int contentLength = connection.getContentLength();
+                    char[] charArray = new char[contentLength];
+
+                    reader.read(charArray);
+
+
+                    //Convert charArray to string
+                    String responseData = new String(charArray);
+                    Log.v(TAG, responseData);
+                }
+                else {
+                    Log.i(TAG, "Unsuccessful HTTP Code: " + responseCode);
+                }
 
 
                 Log.i(TAG, "Code: " + responseCode + "");
