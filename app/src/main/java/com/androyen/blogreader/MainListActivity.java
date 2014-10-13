@@ -1,13 +1,17 @@
 package com.androyen.blogreader;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -28,9 +32,16 @@ public class MainListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_list);
 
-        //Using AsyncTask to get the blog URL
-        GetBlogPostsTask getBlogPostsTask = new GetBlogPostsTask();
-        getBlogPostsTask.execute();
+        if (isNetworkAvailable()) {
+
+            //Using AsyncTask to get the blog URL
+            GetBlogPostsTask getBlogPostsTask = new GetBlogPostsTask();
+            getBlogPostsTask.execute();
+        }
+        else {
+            Toast.makeText(this, "Network is unavailable", Toast.LENGTH_LONG).show();
+        }
+
 
 
         //Initialize String array
@@ -42,6 +53,22 @@ public class MainListActivity extends ListActivity {
 
 //        String message = getString(R.string.no_items);
 //        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean isNetworkAvailable() {
+
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+
+        boolean isAvailable = false;
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            isAvailable = true;
+        }
+
+        return isAvailable;
     }
 
 
