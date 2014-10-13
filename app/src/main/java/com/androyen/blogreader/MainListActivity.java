@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -107,7 +108,20 @@ public class MainListActivity extends ListActivity {
         else {
 
             try {
-                Log.d(TAG, mBlogData.toString(2));
+                JSONArray jsonPosts = mBlogData.getJSONArray("posts");
+                mBlogPostTitles = new String[jsonPosts.length()];
+
+                for (int i = 0; i < jsonPosts.length(); i++) {
+                    JSONObject post = jsonPosts.getJSONObject(i);
+                    String title = post.getString("title");
+
+                    //Used to format and escape HTML markup
+                    title = Html.fromHtml(title).toString();
+                    mBlogPostTitles[i] = title;
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mBlogPostTitles);
+                setListAdapter(adapter);
             }
             catch (JSONException e) {
                 Log.d(TAG, "Exception caught!");
