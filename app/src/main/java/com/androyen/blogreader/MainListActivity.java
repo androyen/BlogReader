@@ -3,9 +3,11 @@ package com.androyen.blogreader;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
@@ -14,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -29,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,6 +100,33 @@ public class MainListActivity extends ListActivity {
         return isAvailable;
     }
 
+    //Built in list view item listeners in ListActivity
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+
+        super.onListItemClick(l, v, position, id);
+
+        try {
+
+            JSONArray jsonPosts = mBlogData.getJSONArray("posts");
+            JSONObject jsonPost = jsonPosts.getJSONObject(position);
+            String blogURL = jsonPost.getString("url");
+
+            //Explicit intent to open BlogWebViewActivity
+            Intent intent = new Intent(this, BlogWebViewActivity.class);
+            intent.setData(Uri.parse(blogURL));
+            startActivity(intent);
+        }
+        catch (JSONException e) {
+            logException(e);
+        }
+    }
+
+    private void logException(Exception e) {
+        Log.e(TAG, "Exception caught", e);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -151,7 +182,7 @@ public class MainListActivity extends ListActivity {
                 setListAdapter(adapter);
             }
             catch (JSONException e) {
-                Log.d(TAG, "Exception caught!");
+                logException(e);
             }
         }
     }
@@ -241,7 +272,7 @@ public class MainListActivity extends ListActivity {
             mBlogData = result;
             handleBlogResponse();
 
-            Log.d(TAG, "mBlogData result " + mBlogData);
+
         }
     }
 }
