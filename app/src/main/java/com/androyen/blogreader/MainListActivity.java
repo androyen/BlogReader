@@ -87,6 +87,7 @@ public class MainListActivity extends ListActivity {
             isAvailable = true;
         }
 
+       Log.v(TAG, "isNetworkAvailable " + isAvailable);
         return isAvailable;
     }
 
@@ -159,7 +160,7 @@ public class MainListActivity extends ListActivity {
 
         //Will return a string
         @Override
-        protected JSONObject doInBackground(Object[] objects) {
+        protected JSONObject doInBackground(Object... objects) {
 
             //-1 is the response code for an error
             int responseCode = -1;
@@ -176,6 +177,8 @@ public class MainListActivity extends ListActivity {
                 URL blogFeedURL = new URL("http://blog.teamtreehouse.com/api/get_recent_summary/?count=" + NUMBER_OF_POSTS);
                 HttpURLConnection connection = (HttpURLConnection) blogFeedURL.openConnection();
                 connection.connect();
+
+                responseCode = connection.getResponseCode();
 
                 //Get inputstream and store the characters in Array
                 if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -196,7 +199,7 @@ public class MainListActivity extends ListActivity {
 
                 }
                 else {
-                    Log.i(TAG, "Unsuccessful HTTP Code: " + responseCode);
+                    Log.i(TAG, " Catch block Unsuccessful HTTP Code: " + responseCode);
                 }
 
 
@@ -223,6 +226,8 @@ public class MainListActivity extends ListActivity {
 
             mBlogData = result;
             handleBlogResponse();
+
+            Log.d(TAG, "mBlogData result " + mBlogData);
         }
     }
 }
